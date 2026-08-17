@@ -54,9 +54,8 @@ REACQUIRE_GRACE = 100000  # LOCK ONCE: keep the SAME operator locked for the
                         # whole session and never auto-switch to another person.
                         # (Restart the script to pick a new operator.)
 SMOOTH = 0.6            # lock position smoothing (0..1, higher = snappier)
-CONFIRM_FRAMES = 4      # candidate must be seen this many consecutive frames
-                        # before it becomes / re-becomes the operator (stops a
-                        # one-frame chair detection from stealing the lock)
+CONFIRM_FRAMES = 1      # lock onto a detected person IMMEDIATELY (first frame)
+                        # and start following - no wait, no confirmation delay.
 CONFIRM_GATE = 0.10     # max centre drift (fraction of width) between those frames
 
 
