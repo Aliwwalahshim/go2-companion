@@ -1,28 +1,19 @@
 # Python 3.8 (Jetson / Ubuntu 20.04).  Install with:  pip3 install --user -r requirements.txt
 #
-# NOT pip-installable - must be set up separately (see README):
-#   - ROS 2 Foxy + rclpy + nav_msgs   (apt, for the SLAM/dashboard map bridge)
-#   - unitree_sdk2py                  (Unitree's Python SDK, from source)
-#   - Vosk speech model               (download the model, see README)
-#   - portaudio19-dev                 (apt, needed to build pyaudio)
+# NOT pip-installable - install separately:
+#   - unitree_sdk2py       (Unitree's Python SDK, from source)
+#   - portaudio19-dev      (apt; needed by the robot-speaker audio dep)
 
 # vision / perception
 opencv-python
 numpy
-mediapipe
-pyrealsense2
-ultralytics            # YOLOv8 person detection
+mediapipe                # hand/pose gesture recognition
+pyrealsense2             # RealSense depth camera
+ultralytics              # YOLOv8 person detection (for the follow mode)
 
-# robot audio over WebRTC (speaker + mic)
-unitree-webrtc-connect
-av                     # PyAV, audio frame decode
-# pyaudio is pulled in by unitree-webrtc-connect (needs portaudio19-dev)
-
-# offline speech recognition
-vosk
-
-# web dashboard
-tornado
-
-# desktop control GUI (optional)
+# desktop control GUI
 PyQt5
+
+# robot head-speaker announcements (WebRTC)
+unitree-webrtc-connect
+av
