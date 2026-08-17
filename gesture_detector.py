@@ -51,8 +51,9 @@ MIN_SHOULDER_W = 0.02
 # ---- Finger-state thresholds
 FINGER_STRAIGHT_K = 0.55   # tip must be this much farther from wrist than pip
 THUMB_STRAIGHT_K = 0.35
-POINT_AXIS_RATIO = 1.2     # how much the horizontal axis must dominate to
-                           # read as LEFT/RIGHT instead of UP
+POINT_AXIS_RATIO = 1.6     # the index must point CLEARLY sideways to read as
+                           # LEFT/RIGHT; otherwise a raised index reads as ONE
+                           # (so ONE is the reliable default, not a diagonal L/R)
 
 # ---- Debounce for the continuous ("stable") driving signal
 STABLE_FRAMES = 4
@@ -337,6 +338,12 @@ def _finger_extended(lm, name):
 
 
 def _classify_hand(lm, mirrored, shape=None):
+    # Only read gestures from a hand that is deliberately RAISED (knuckles
+    # above the wrist). A hand hanging down in a normal stance reads nothing,
+    # so a lowered/resting hand is never misread as FIST or THUMBS_DOWN.
+    if lm[_MCP["middle"]].y > lm[WRIST].y + 0.03:
+        return 0, None
+
     ext = {name: _finger_extended(lm, name) for name in _TIP}
     count = sum(1 for name in ("thumb", "index", "middle", "ring", "pinky")
                if ext[name])
@@ -344,11 +351,6 @@ def _classify_hand(lm, mirrored, shape=None):
                      if ext[name])
 
     if four_count == 0 and not ext["thumb"]:
-        # A relaxed hand hanging DOWN (knuckles well below the wrist) is not
-        # an intentional fist - read nothing, so a lowered/resting hand in the
-        # menu does not fire the FIST action.
-        if lm[_MCP["middle"]].y > lm[WRIST].y + 0.03:
-            return 0, None
         return 0, "FIST"
 
     if four_count == 0 and ext["thumb"]:
@@ -360,7 +362,9 @@ def _classify_hand(lm, mirrored, shape=None):
             return 1, "THUMBS_DOWN"
         return 1, "FIST"
 
-    if four_count == 1 and ext["index"] and not ext["thumb"]:
+    if four_count == 1 and ext["index"]:
+        # index is the only finger up (the thumb may naturally stick out -
+        # that no longer blocks the reading, which is why ONE was flaky).
         wrist = lm[WRIST]
         tip = lm[_TIP["index"]]
         # Landmarks are normalized to the width/height of whatever image was

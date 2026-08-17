@@ -913,6 +913,11 @@ def main():
     finally:
         robot.stop_move()
         robot.cmd("StopMove")
+        # Always sit the robot down when the console exits - however it exits
+        # (quit gesture, q/ESC, Ctrl+C, SIGTERM, or a crash) - so it is never
+        # left standing unattended.
+        robot.cmd("StandDown")
+        time.sleep(1.5)
         det.close()
         cam.close()
         cv2.destroyAllWindows()
