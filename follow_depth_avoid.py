@@ -25,7 +25,7 @@ them won't trigger it. Depth avoidance keeps running throughout; it just has
 nothing to correct while the commanded velocity is already zero.
 
 STAIR GESTURES: same crop, same reader, two more single-hand gestures.
-Hold up 1 finger (POINT_UP) and the robot switches to Classic gait
+Hold up 1 finger (ONE) and the robot switches to Classic gait
 (SportClient.ClassicWalk(True) - the gait confirmed on this unit to climb
 real stairs, see go2_master.py's STAIRS mode) and the depth-avoidance layer
 (the "depth lidar") is disabled, so it will not read a stair riser as an
@@ -74,7 +74,7 @@ STOP_BOX_MARGIN = 0.25      # grow the operator bbox this much before reading
                             # the gesture, so a hand near the box edge isn't clipped
 
 # --- stair gestures (1 finger = climb mode, 2 fingers = back to normal) ---
-CLIMB_ON_GESTURE = "POINT_UP"    # 1 finger: ClassicWalk + depth-avoid OFF
+CLIMB_ON_GESTURE = "ONE"         # 1 finger up: ClassicWalk + depth-avoid OFF
 CLIMB_OFF_GESTURE = "PEACE"      # 2 fingers: FreeWalk + depth-avoid ON
 
 # --- follow control ---
@@ -213,7 +213,7 @@ def main():
         print("[gait] BalanceStand failed: %s" % exc)
     time.sleep(1.0)
     # Free gait is always the starting state - climb mode (Classic gait) is
-    # only ever entered live, via the POINT_UP gesture below, never at
+    # only ever entered live, via the ONE (1-finger) gesture below, never at
     # startup.
     try:
         try:
@@ -267,7 +267,7 @@ def main():
     lost = 0
     stopped_by_gesture = False
     stopped_prev = False
-    climb_mode = False          # POINT_UP -> True (Classic gait, depth-avoid off)
+    climb_mode = False          # ONE (1 finger) -> True (Classic gait, depth-avoid off)
     depth_avoid_enabled = True  # only meaningful while depth_av is not None
     smooth_offset = 0.0
     smooth_dist = 0.0
@@ -327,7 +327,7 @@ def main():
             print("[robot] StandDown failed: %s" % exc)
 
     def set_climb_mode(on):
-        """POINT_UP -> on=True: Classic gait, depth-avoid off, so a stair
+        """ONE (1 finger) -> on=True: Classic gait, depth-avoid off, so a stair
         riser is never read as an obstacle to stop for. PEACE -> on=False:
         back to Free gait, depth-avoid back on. Never the default - only
         reachable live, by gesture."""

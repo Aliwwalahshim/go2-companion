@@ -146,7 +146,7 @@ BINDINGS = {
     # Mode selection now runs on the SAME single-hand finger vocabulary as
     # in-mode commands - hold up fingers to choose, instead of an arm pose.
     "MENU": [
-        Bind("POINT_UP", "DRIVE mode", "mode", "DRIVE", HOLD_MODE,
+        Bind("ONE", "DRIVE mode", "mode", "DRIVE", HOLD_MODE,
              "1 finger"),
         Bind("PEACE", "ACTIONS mode", "mode", "ACTIONS", HOLD_MODE,
              "2 fingers"),
@@ -177,7 +177,7 @@ BINDINGS = {
     ],
 
     "ACTIONS": [
-        Bind("POINT_UP", "wave hello", "cmd", ("Hello",), note="1 finger up"),
+        Bind("ONE", "wave hello", "cmd", ("Hello",), note="1 finger up"),
         Bind("PEACE", "heart gesture", "cmd", ("Heart",)),
         Bind("THREE", "stretch", "cmd", ("Stretch",)),
         Bind("FOUR", "dance 1", "cmd", ("Dance1",)),
@@ -187,7 +187,7 @@ BINDINGS = {
     ],
 
     "GAITS": [
-        Bind("POINT_UP", "static walk (slow, stable)", "cmd", ("StaticWalk",)),
+        Bind("ONE", "static walk (slow, stable)", "cmd", ("StaticWalk",)),
         Bind("PEACE", "trot / run", "cmd", ("TrotRun",)),
         Bind("THREE", "free walk", "cmd", ("FreeWalk",)),
         Bind("FOUR", "classic walk ON", "cmd", ("ClassicWalk", True)),
@@ -211,7 +211,7 @@ BINDINGS = {
     # with ClassicWalk(True) sent purely from this console (as opposed to
     # the remote combo) - test that before trusting it unattended.
     "STAIRS": [
-        Bind("POINT_UP", "classic walk ON - for stairs (up forward, "
+        Bind("ONE", "classic walk ON - for stairs (up forward, "
              "down backward)", "cmd", ("ClassicWalk", True),
              note="1 finger"),
         Bind("PEACE", "free walk - normal gait", "cmd", ("FreeWalk",),
@@ -221,7 +221,7 @@ BINDINGS = {
     "POSTURE": [
         Bind("THUMBS_UP", "stand up", "cmd", ("StandUp",)),
         Bind("THUMBS_DOWN", "lie down", "cmd", ("StandDown",)),
-        Bind("POINT_UP", "sit", "cmd", ("Sit",)),
+        Bind("ONE", "sit", "cmd", ("Sit",)),
         Bind("PEACE", "rise from sitting", "cmd", ("RiseSit",)),
         Bind("THREE", "recover after a fall", "cmd", ("RecoveryStand",)),
         Bind("FOUR", "pose mode ON", "cmd", ("Pose", True)),
@@ -713,6 +713,8 @@ def main():
     latched, latched_at = None, 0.0      # grace window for hand dropouts
     last_debug = 0.0
     handstand_until = 0.0        # HandStand(True) deadline; 0.0 = not active
+    active_drive = None          # label of the drive in progress, so we
+                                 # announce it once when it starts (not per frame)
 
     announce("Ready. Menu mode.")
 
@@ -800,8 +802,13 @@ def main():
                     if vx > 0.01 or abs(vy) > 0.01 or abs(vyaw) > 0.01:
                         robot.move(vx, vy, vyaw)
                         driving = True
+                        # speak the drive ONCE when it starts (not every frame)
+                        if active_drive != db.label:
+                            announce(db.label)
+                            active_drive = db.label
             if not driving:
                 robot.stop_move()
+                active_drive = None
 
             # ---- HandStand auto-revert: HandStand(True) is a self-timed
             # trick, not a held-forever pose - come back down on our own

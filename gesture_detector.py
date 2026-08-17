@@ -14,7 +14,7 @@ to go wrong.
 
 WHAT THIS PROVIDES
 ------------------
-* Finger-count / shape gestures from the one tracked hand: FIST, POINT_UP,
+* Finger-count / shape gestures from the one tracked hand: FIST, ONE,
   POINT_LEFT, POINT_RIGHT, PEACE, THREE, FOUR, THUMBS_UP, THUMBS_DOWN,
   OPEN_PALM. These drive BOTH the menu (mode selection) and in-mode
   commands in go2_master.py.
@@ -344,6 +344,11 @@ def _classify_hand(lm, mirrored, shape=None):
                      if ext[name])
 
     if four_count == 0 and not ext["thumb"]:
+        # A relaxed hand hanging DOWN (knuckles well below the wrist) is not
+        # an intentional fist - read nothing, so a lowered/resting hand in the
+        # menu does not fire the FIST action.
+        if lm[_MCP["middle"]].y > lm[WRIST].y + 0.03:
+            return 0, None
         return 0, "FIST"
 
     if four_count == 0 and ext["thumb"]:
@@ -379,7 +384,10 @@ def _classify_hand(lm, mirrored, shape=None):
             # Only a raw, un-flipped frame needs inverting.
             right = (dx > 0) if mirrored else (dx < 0)
             return 1, "POINT_RIGHT" if right else "POINT_LEFT"
-        return 1, "POINT_UP"
+        # index finger up (not clearly sideways) = a 1-finger count.
+        # This replaces the old POINT_UP so a raised index reads as "ONE"
+        # instead of a directional point.
+        return 1, "ONE"
 
     if four_count == 2 and ext["index"] and ext["middle"]:
         return 2, "PEACE"
