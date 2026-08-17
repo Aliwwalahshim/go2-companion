@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# editor / backups
+*.save
+*.swp
+*~
+.vscode/
+.idea/
+.claude/
+
+# runtime / generated
+/tmp/
+*.log
+map.png
+map.json
+
+# large assets that must NOT be committed (download separately - see README)
+vosk_models/
+vosk-model-*/
+*.engine
+*.pt
+*.db
+training_data/
