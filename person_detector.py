@@ -44,10 +44,15 @@ except Exception as exc:
 PERSON_CLASS = 0        # COCO 'person'
 
 # --- tracker tuning (all in fractions of frame width, so resolution-independent) ---
-MATCH_GATE = 0.18       # max centre move between frames to count as same person
+MATCH_GATE = 0.30       # max centre move between frames to count as same person.
+                        # Widened so fast left/right walking does not drop the
+                        # lock between frames.
 SIZE_RATIO = (0.5, 2.0) # allowed box-size change to count as same person
-REACQUIRE_RADIUS = 0.30 # how near last-known centre a returning person must appear
-REACQUIRE_GRACE = 45    # frames to keep the lock alive while operator is missing
+REACQUIRE_RADIUS = 0.45 # how near last-known centre a returning person must
+                        # appear - wider so stepping aside and back re-locks you
+REACQUIRE_GRACE = 100000  # LOCK ONCE: keep the SAME operator locked for the
+                        # whole session and never auto-switch to another person.
+                        # (Restart the script to pick a new operator.)
 SMOOTH = 0.6            # lock position smoothing (0..1, higher = snappier)
 CONFIRM_FRAMES = 4      # candidate must be seen this many consecutive frames
                         # before it becomes / re-becomes the operator (stops a

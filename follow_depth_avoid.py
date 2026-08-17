@@ -78,7 +78,9 @@ CLIMB_ON_GESTURE = "POINT_UP"    # 1 finger: ClassicWalk + depth-avoid OFF
 CLIMB_OFF_GESTURE = "PEACE"      # 2 fingers: FreeWalk + depth-avoid ON
 
 # --- follow control ---
-STOP_DISTANCE_M = 1.7
+STOP_DISTANCE_M = 2.3      # hold ~2.3 m back so you stay in the camera's view;
+                          # it drives forward whenever you walk away and holds
+                          # when you stop - you never have to stop for it
 MIN_SAFE_M = 0.9
 DIST_DEADBAND_M = 0.2
 ROT_KP = 1.0
@@ -88,8 +90,10 @@ ROT_SIGN = 1.0
 FWD_KP = 0.8
 FWD_MAX = 0.5              # gentler: avoidance needs time to react
 LAT_MAX = 0.35
-LOST_GRACE_FRAMES = 15
-HOLD_DECAY = 0.94
+LOST_GRACE_FRAMES = 40    # if you slip out of frame (e.g. quick left/right),
+                          # keep coasting + turning toward where you went this
+                          # many frames so it swings back onto you
+HOLD_DECAY = 0.96
 DEPTH_WINDOW = 5
 MOVE_INTERVAL = 0.06
 
