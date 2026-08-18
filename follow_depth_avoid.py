@@ -59,9 +59,12 @@ from gesture_detector import GestureDetector
 CAM_W, CAM_H, CAM_FPS = 848, 480, 30
 MIRROR_IMAGE = True
 
-MODEL_PATH = "yolov8n.engine"
+MODEL_PATH = "yolo11n.pt"   # YOLO11 nano: newer + more accurate than yolov8n
+                            # at the same speed, so it stops reading a chair as
+                            # a person. (ultralytics auto-downloads it if the
+                            # file is not already in this folder.)
 IMGSZ = 320
-DET_CONF = 0.50
+DET_CONF = 0.60             # higher confidence -> fewer false detections
 FIX_EXPOSURE = True
 
 USE_BUILTIN_AVOID = True   # Go2 LiDAR, for tall obstacles
@@ -135,8 +138,8 @@ def load_detector():
     import os
     path = MODEL_PATH
     if path.endswith(".engine") and not os.path.exists(path):
-        print("[detector] %s not found - falling back to yolov8n.pt" % path)
-        path = "yolov8n.pt"
+        print("[detector] %s not found - falling back to yolo11n.pt" % path)
+        path = "yolo11n.pt"
     det = PersonDetector(path, imgsz=IMGSZ, conf=DET_CONF)
     print("[detector] loaded %s (imgsz=%d, conf=%.2f)" % (path, IMGSZ, DET_CONF))
     return det
