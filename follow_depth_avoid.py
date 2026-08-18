@@ -86,6 +86,13 @@ STOP_DISTANCE_M = 2.3      # hold ~2.3 m back so you stay in the camera's view;
                           # when you stop - you never have to stop for it
 MIN_SAFE_M = 0.9
 DIST_DEADBAND_M = 0.2
+APPROACH_SPEED = 0.35     # m/s to close the gap when a person is detected but
+                          # is beyond the depth camera's range (~6 m), so there
+                          # is no distance reading yet - walk toward them until
+                          # depth kicks in and normal distance control resumes
+FAR_BOX_FRAC = 0.55       # only approach-without-depth while the operator's box
+                          # is smaller than this fraction of the frame height
+                          # (they really are far - not a close-range depth hole)
 ROT_KP = 1.0
 ROT_MAX = 0.7
 ROT_DEADBAND = 0.10
@@ -421,6 +428,15 @@ def main():
                     err = smooth_dist - STOP_DISTANCE_M
                     if err > DIST_DEADBAND_M and smooth_dist > MIN_SAFE_M:
                         tgt_fwd = clamp(FWD_KP * err, 0.0, FWD_MAX)
+                else:
+                    # Person detected but beyond the depth camera's range
+                    # (~6 m) so there is no distance reading. Walk toward them
+                    # at a steady pace to close the gap; once they are in
+                    # range the depth branch above takes over. Guarded by box
+                    # size so a close-range depth hole cannot drive us in.
+                    x1b, y1b, x2b, y2b = res.bbox
+                    if (y2b - y1b) / float(CAM_H) < FAR_BOX_FRAC:
+                        tgt_fwd = APPROACH_SPEED
 
                 # ---- stop-sign gesture: open palm halts the robot ----
                 stopped_by_gesture = False
