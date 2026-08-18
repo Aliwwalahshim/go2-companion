@@ -175,7 +175,14 @@ class GestureDetector:
         if hand_lms:
             res.hands = [hand_lms]
             res._hand_landmarks = hand_lms
-            fingers, gesture = _classify_hand(hand_lms, self.mirrored, proc_shape)
+            # Only read a gesture when an arm is actually raised. If pose says
+            # both arms are down, read nothing - hands resting at your sides
+            # never trigger anything; lift an arm to start.
+            if pose_landmarks is not None and not _arm_raised(pose_landmarks):
+                fingers, gesture = 0, None
+            else:
+                fingers, gesture = _classify_hand(
+                    hand_lms, self.mirrored, proc_shape)
             res.fingers = fingers
             res.hand_gesture = gesture
 
@@ -316,6 +323,32 @@ def _classify_arm(landmarks):
     if l_out and r_out:
         return "T_POSE"
     return None
+
+
+def _arm_raised(landmarks):
+    """True if an arm is lifted to gesture (a wrist is above its elbow).
+
+    When both arms hang down at your sides, this returns False so the console
+    reads NOTHING - you must raise an arm to start making gestures. If neither
+    arm is confidently visible it returns True (can't tell -> don't block; the
+    hand-orientation check still applies)."""
+    try:
+        pairs = ((mp_pose.PoseLandmark.LEFT_WRIST.value,
+                  mp_pose.PoseLandmark.LEFT_ELBOW.value),
+                 (mp_pose.PoseLandmark.RIGHT_WRIST.value,
+                  mp_pose.PoseLandmark.RIGHT_ELBOW.value))
+        evaluable = False
+        for wi, ei in pairs:
+            w = landmarks[wi]
+            e = landmarks[ei]
+            if w.visibility < WRIST_VIS or e.visibility < 0.3:
+                continue
+            evaluable = True
+            if w.y < e.y - 0.02:          # wrist higher in frame than elbow
+                return True
+        return not evaluable              # saw an arm, none raised -> down
+    except Exception:
+        return True
 
 
 # Landmark indices (MediaPipe Hands)
