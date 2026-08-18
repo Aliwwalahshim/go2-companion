@@ -9,7 +9,7 @@ leave the view and come back.
 
 SEAM (how the follow code uses it)
 ----------------------------------
-    det = PersonDetector("yolov8n.engine")   # or "yolov8n.pt"
+    det = PersonDetector("yolo11n.pt")       # YOLO11 nano (default)
     det.reset()                              # call when FOLLOW mode starts
     res = det.update(color_frame)            # every frame
     if res:                                  # res.cx, res.cy, res.bbox, res.state
@@ -73,7 +73,7 @@ class PersonBox:
 
 
 class PersonDetector:
-    def __init__(self, model_path="yolov8n.pt", imgsz=320, conf=0.4):
+    def __init__(self, model_path="yolo11n.pt", imgsz=320, conf=0.4):
         if YOLO is None:
             raise RuntimeError(
                 f"ultralytics not available: {_IMPORT_ERR}\n"

@@ -9,7 +9,7 @@ opencv-python
 numpy
 mediapipe                # hand/pose gesture recognition
 pyrealsense2             # RealSense depth camera
-ultralytics              # YOLOv8 person detection (for the follow mode)
+ultralytics              # YOLO11 person detection (for the follow mode)
 
 # desktop control GUI
 PyQt5

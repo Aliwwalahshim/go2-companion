@@ -14,10 +14,10 @@ Everything here has been run and tested on the real robot.
 |------|--------------|
 | **`go2_master.py`** | Gesture console - drive and pose the robot with hand gestures (MediaPipe). Each action is announced out loud through the robot's own head speaker (over WebRTC). |
 | **`go2_control_gui.py`** | Desktop control panel (PyQt5) - drive the robot, trigger actions, and see the camera feed, from a GUI. |
-| **`follow_depth_avoid.py`** | Person follow - locks onto an operator (YOLOv8), follows them, and uses RealSense depth for obstacle avoidance. Hold an open palm to STOP. |
+| **`follow_depth_avoid.py`** | Person follow - locks onto an operator (YOLO11), follows them, and uses RealSense depth for obstacle avoidance. Hold an open palm to STOP. |
 
 Supporting modules: `gesture_detector.py` (MediaPipe gestures),
-`person_detector.py` (YOLOv8 operator lock/track), `depth_avoider.py`
+`person_detector.py` (YOLO11 operator lock/track), `depth_avoider.py`
 (RealSense depth to obstacle avoidance), `go2_speaker.py` (robot head-speaker
 announcements).
 
