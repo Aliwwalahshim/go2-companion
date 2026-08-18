@@ -322,6 +322,10 @@ def _classify_arm(landmarks):
     r_out = r_level and abs(rw.x - rs_.x) > OUT_K * sw
     if l_out and r_out:
         return "T_POSE"
+    if l_out:
+        return "LEFT_OUT"      # left arm extended straight out to the side
+    if r_out:
+        return "RIGHT_OUT"     # right arm extended straight out to the side
     return None
 
 

@@ -110,7 +110,7 @@ GESTURE_GRACE = 0.40         # seconds a trigger survives a tracking dropout
 # only arm gesture left, and it necessarily shows open palms, so without
 # this it would lose the race to the incidental OPEN_PALM (global STOP)
 # every time and could never fire.
-DOMINANT_ARM = {"T_POSE"}
+DOMINANT_ARM = {"T_POSE", "LEFT_OUT", "RIGHT_OUT"}
 
 # =======================================================================
 # THE TABLE - behaviour, reference and on-screen menu all come from here
@@ -165,8 +165,8 @@ BINDINGS = {
     "DRIVE": [
         Bind("PEACE", "walk forward", "drive", (WALK_SPEED, 0.0, 0.0),
              note="2 fingers"),
-        Bind("POINT_LEFT", "turn left", "drive", (0.0, 0.0, TURN_SPEED)),
-        Bind("POINT_RIGHT", "turn right", "drive", (0.0, 0.0, -TURN_SPEED)),
+        Bind("LEFT_OUT", "turn left", "drive", (0.0, 0.0, TURN_SPEED)),
+        Bind("RIGHT_OUT", "turn right", "drive", (0.0, 0.0, -TURN_SPEED)),
         Bind("THREE", "strafe left", "drive", (0.0, 0.25, 0.0),
              note="3 fingers"),
         Bind("FOUR", "strafe right", "drive", (0.0, -0.25, 0.0),
@@ -235,7 +235,7 @@ BINDINGS = {
              "large clear area"),
         Bind("THUMBS_DOWN", "BACK FLIP", "cmd", ("BackFlip",), HOLD_TRICK,
              "large clear area"),
-        Bind("POINT_LEFT", "LEFT FLIP", "cmd", ("LeftFlip",), HOLD_TRICK,
+        Bind("LEFT_OUT", "LEFT FLIP", "cmd", ("LeftFlip",), HOLD_TRICK,
              "no RightFlip exists in the SDK"),
         Bind("PEACE", "front jump", "cmd", ("FrontJump",), HOLD_TRICK),
         Bind("THREE", "front pounce", "cmd", ("FrontPounce",), HOLD_TRICK),
@@ -776,9 +776,16 @@ def main():
 
             # ---- continuous driving happens on the LEVEL signal ----
             driving = False
-            if mode == "DRIVE" and res.stable:
-                db = next((b for b in rows
-                           if b.trigger == res.stable and b.kind == "drive"), None)
+            if mode == "DRIVE":
+                # match a drive bind by the held HAND gesture, or by an ARM-out
+                # pose (turn left/right are now LEFT_OUT / RIGHT_OUT).
+                db = None
+                if res.stable:
+                    db = next((b for b in rows if b.trigger == res.stable
+                               and b.kind == "drive"), None)
+                if db is None and res.arm_gesture:
+                    db = next((b for b in rows if b.trigger == res.arm_gesture
+                               and b.kind == "drive"), None)
                 if db is not None:
                     vx, vy, vyaw = db.payload
                     if vx > 0.01:
